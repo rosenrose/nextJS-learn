@@ -8,10 +8,10 @@ export default function NavBar() {
     <nav>
       <img src="/vercel.svg" />
       <div>
-        <Link href="/" as={process.env.BACKEND_URL + "/"}>
+        <Link href="/" as={"/"}>
           <a className={router.pathname === "/" ? "active" : ""}>Home</a>
         </Link>
-        <Link href="/about" as={process.env.BACKEND_URL + "/about"}>
+        <Link href="/about" as={"/about"}>
           <a className={router.pathname === "/about" ? "active" : ""}>About</a>
         </Link>
       </div>
@@ -23,7 +23,8 @@ export default function NavBar() {
           align-items: center;
           padding-top: 20px;
           padding-bottom: 10px;
-          box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+          box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+            rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
         }
         img {
           max-width: 100px;

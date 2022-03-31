@@ -1,7 +1,6 @@
 const API_KEY = process.env.API_KEY;
 
 module.exports = {
-  assetPrefix: "/nextjs/nextJS-intro/out/",
   reactStrictMode: true,
   async redirects() {
     return [

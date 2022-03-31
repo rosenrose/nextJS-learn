@@ -33,9 +33,11 @@ export default function Home({ data }) {
 
           return (
             <div onClick={() => onClick(id, title)} className="movie" key={id}>
-              <img src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url} />
+              <img
+                src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
+              />
               <h4>
-                <Link href={url} as={process.env.BACKEND_URL + url}>
+                <Link href={url} as={url}>
                   <a>{title}</a>
                 </Link>
               </h4>
