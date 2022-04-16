@@ -4,7 +4,7 @@ const API_KEY = process.env.API_KEY;
 module.exports = {
   reactStrictMode: true,
   basePath: "/nextJS-intro",
-  // assetPrefix: "/nextJS-intro",
+  assetPrefix: "/nextJS-intro",
   // images: {
   //   domains: ["i.ytimg.com"],
   // },
