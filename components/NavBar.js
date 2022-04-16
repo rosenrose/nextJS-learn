@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 import { useRouter } from "next/router";
 
 export default function NavBar() {
@@ -8,7 +8,7 @@ export default function NavBar() {
   return (
     <nav>
       {/* <Image src="/vercel.svg" alt="vercel.svg" width="100%" height="100%" /> */}
-      <img src="/vercel.svg" alt="vercel.svg" />
+      <img src={`${process.env.basePath}/vercel.svg`} alt="vercel.svg" />
       <div>
         <Link href="/" as={"/"}>
           <a className={router.pathname === "/" ? "active" : ""}>Home</a>

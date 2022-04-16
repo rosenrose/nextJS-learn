@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import Seo from "../../components/Seo";
 
 export default function Detail({ paths }) {
