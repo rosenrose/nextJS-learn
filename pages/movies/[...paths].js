@@ -10,7 +10,12 @@ export default function Detail({ paths }) {
   const [movie, setMovie] = useState();
   useEffect(() => {
     (async () => {
-      const data = await (await fetch(`/api/video/${id}`)).json();
+      // const data = await (await fetch(`/api/video/${id}`)).json();
+      const data = await (
+        await fetch(
+          `https://www.googleapis.com/youtube/v3/videos?key=${process.env.API_KEY}&id=${id}&part=snippet,contentDetails`
+        )
+      ).json();
       setMovie(data.items[0]);
     })();
   }, [id]);

@@ -1,3 +1,3 @@
 export default function All() {
-    return "All";
+  return "All";
 }

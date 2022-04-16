@@ -4,13 +4,20 @@ import { useRouter } from "next/router";
 import Seo from "../components/Seo";
 
 const id = "PLtYQ7DpMMg-I22iICgrMNC1ln3ZT4FxUj";
+const API_KEY = process.env.API_KEY;
+// console.log(id, API_KEY);
 
 export default function Home({ data }) {
   const [movies, setMovies] = useState();
   useEffect(() => {
     (async () => {
+      // const data = await (
+      //   await fetch(`/api/playlist/playlistId=${id}&part=snippet,contentDetails&maxResults=20`)
+      // ).json();
       const data = await (
-        await fetch(`/api/playlist/playlistId=${id}&part=snippet,contentDetails&maxResults=20`)
+        await fetch(
+          `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${id}&part=snippet,contentDetails&maxResults=20`
+        )
       ).json();
       setMovies(data.items);
     })();
