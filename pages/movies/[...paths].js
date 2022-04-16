@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Seo from "../../components/Seo";
 
 export default function Detail({ paths }) {
@@ -25,12 +26,21 @@ export default function Detail({ paths }) {
       {!movie ? (
         "로딩..."
       ) : (
-        <>
+        <div>
           <Seo title={title} />
-          <img src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url} />
+          {/* <Image
+            src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
+            alt={id}
+            layout="fill"
+            objectFit="contain"
+          /> */}
+          <img
+            src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
+            alt={id}
+          />
           <h4>{title}</h4>
           <pre>{JSON.stringify(movie, null, 2)}</pre>
-        </>
+        </div>
       )}
     </div>
   );

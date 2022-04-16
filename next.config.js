@@ -5,6 +5,9 @@ module.exports = {
   reactStrictMode: true,
   basePath: "/nextJS-intro",
   assetPrefix: "/nextJS-intro",
+  images: {
+    domains: ["i.ytimg.com"],
+  },
   env: {
     API_KEY,
   },

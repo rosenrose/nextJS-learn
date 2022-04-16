@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import Seo from "../components/Seo";
 
@@ -40,8 +41,15 @@ export default function Home({ data }) {
 
           return (
             <div onClick={() => onClick(id, title)} className="movie" key={id}>
+              {/* <Image
+                src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
+                alt={id}
+                width="100%"
+                height="100%"
+              /> */}
               <img
                 src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
+                alt={id}
               />
               <h4>
                 <Link href={url} as={url}>
