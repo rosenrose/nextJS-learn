@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Seo from "../components/Seo";
 
+// const id = "PLtYQ7DpMMg-I22iICgrMNC1ln3ZT4FxUj";
 const id = "UUyWiQldYO_-yeLJC0j5oq2g";
 const API_KEY = process.env.API_KEY;
 // console.log(id, API_KEY);
 
 export default function Home({ data }) {
   const [movies, setMovies] = useState();
+  const [thumbnails, setThumbnails] = useState([]);
   useEffect(() => {
     (async () => {
       // const data = await (
@@ -21,6 +23,9 @@ export default function Home({ data }) {
         )
       ).json();
       setMovies(data.items);
+      setThumbnails(
+        await Promise.all(data.items.map(async (movie) => (await extractInfo(movie)).thumbnail))
+      );
     })();
   }, []);
   const router = useRouter();
@@ -34,23 +39,14 @@ export default function Home({ data }) {
       {!movies ? (
         <h1>로딩...</h1>
       ) : (
-        movies?.map((movie) => {
-          let id = movie.contentDetails.videoId;
-          let title = movie.snippet.title.replace(/\[DJMax Respect V\] | \(M\/V 4K 60FPS\)/g, "");
-          let url = `/movies/${encodeURIComponent(title)}/${id}`;
+        movies?.map((movie, i) => {
+          const id = movie.contentDetails.videoId;
+          const title = movie.snippet.title;
+          const url = `/movies/${encodeURIComponent(title)}/${id}`;
 
           return (
             <div onClick={() => onClick(id, title)} className="movie" key={id}>
-              {/* <Image
-                src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
-                alt={id}
-                width="100%"
-                height="100%"
-              /> */}
-              <img
-                src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
-                alt={id}
-              />
+              <img src={thumbnails[i]} alt={id} />
               <h4>
                 <Link href={url} as={url}>
                   <a>{title}</a>
@@ -86,6 +82,34 @@ export default function Home({ data }) {
       `}</style>
     </div>
   );
+}
+
+async function extractInfo(item) {
+  const { title, description, publishedAt: date, thumbnails } = item.snippet;
+  const info = { title, description, date };
+  const thumbnail = thumbnails[Object.keys(thumbnails).at(-1)].url;
+
+  if (thumbnail.endsWith("maxresdefault.jpg")) {
+    return { ...info, thumbnail };
+  } else {
+    const availableRes = ["maxresdefault", "sddefault", "hqdefault", "mqdefault", "default"];
+
+    for (const res of availableRes) {
+      const maxres = thumbnail.replace(/[^\/]+(?=.jpg)/, res);
+      const status = await (
+        await fetch(
+          `https://rosenrose-proxy.herokuapp.com/status?url=${encodeURIComponent(maxres)}`
+        )
+      ).text();
+      // const status = (await fetch(maxres)).status;
+
+      if (status === "200") {
+        return { ...info, thumbnail: maxres };
+      }
+    }
+
+    return { ...info, thumbnail: "" };
+  }
 }
 
 // export async function getServerSideProps() {

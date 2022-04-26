@@ -9,6 +9,7 @@ export default function Detail({ paths }) {
   // const [title, id] = paths || [];
 
   const [movie, setMovie] = useState();
+  const [thumbnail, setThumbnail] = useState("");
   useEffect(() => {
     (async () => {
       // const data = await (await fetch(`/api/video/${id}`)).json();
@@ -18,6 +19,7 @@ export default function Detail({ paths }) {
         )
       ).json();
       setMovie(data.items[0]);
+      setThumbnail((await extractInfo(data.items[0])).thumbnail);
     })();
   }, [id]);
 
@@ -28,22 +30,40 @@ export default function Detail({ paths }) {
       ) : (
         <div>
           <Seo title={title} />
-          {/* <Image
-            src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
-            alt={id}
-            layout="fill"
-            objectFit="contain"
-          /> */}
-          <img
-            src={movie.snippet.thumbnails[Object.keys(movie.snippet.thumbnails).at(-1)].url}
-            alt={id}
-          />
+          <img src={thumbnail} alt={id} />
           <h4>{title}</h4>
           <pre>{JSON.stringify(movie, null, 2)}</pre>
         </div>
       )}
     </div>
   );
+}
+
+async function extractInfo(item) {
+  const { title, description, publishedAt: date, thumbnails } = item.snippet;
+  const info = { title, description, date };
+  const thumbnail = thumbnails[Object.keys(thumbnails).at(-1)].url;
+
+  if (thumbnail.endsWith("maxresdefault.jpg")) {
+    return { ...info, thumbnail };
+  } else {
+    const availableRes = ["maxresdefault", "sddefault", "hqdefault", "mqdefault", "default"];
+
+    for (const res of availableRes) {
+      const maxres = thumbnail.replace(/[^\/]+(?=.jpg)/, res);
+      const status = await (
+        await fetch(
+          `https://rosenrose-proxy.herokuapp.com/status?url=${encodeURIComponent(maxres)}`
+        )
+      ).text();
+
+      if (status === "200") {
+        return { ...info, thumbnail: maxres };
+      }
+    }
+
+    return { ...info, thumbnail: "" };
+  }
 }
 
 // export function getServerSideProps({ params: { paths } }) {
