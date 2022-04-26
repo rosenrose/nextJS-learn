@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Seo from "../components/Seo";
 
-const id = "PLtYQ7DpMMg-I22iICgrMNC1ln3ZT4FxUj";
+const id = "UUyWiQldYO_-yeLJC0j5oq2g";
 const API_KEY = process.env.API_KEY;
 // console.log(id, API_KEY);
 
