@@ -22,10 +22,17 @@ export default function Home({ data }) {
           `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${id}&part=snippet,contentDetails&maxResults=20`
         )
       ).json();
-      setMovies(data.items);
+
       setThumbnails(
-        await Promise.all(data.items.map(async (movie) => (await extractInfo(movie)).thumbnail))
+        await Promise.all(
+          data.items.map((movie) =>
+            fetch(
+              `https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${movie.contentDetails.videoId}`
+            ).then((response) => response.text())
+          )
+        )
       );
+      setMovies(data.items);
     })();
   }, []);
   const router = useRouter();
@@ -82,34 +89,6 @@ export default function Home({ data }) {
       `}</style>
     </div>
   );
-}
-
-async function extractInfo(item) {
-  const { title, description, publishedAt: date, thumbnails } = item.snippet;
-  const info = { title, description, date };
-  const thumbnail = thumbnails[Object.keys(thumbnails).at(-1)].url;
-
-  if (thumbnail.endsWith("maxresdefault.jpg")) {
-    return { ...info, thumbnail };
-  } else {
-    const availableRes = ["maxresdefault", "sddefault", "hqdefault", "mqdefault", "default"];
-
-    for (const res of availableRes) {
-      const maxres = thumbnail.replace(/[^\/]+(?=.jpg)/, res);
-      const status = await (
-        await fetch(
-          `https://rosenrose-proxy.herokuapp.com/status?url=${encodeURIComponent(maxres)}`
-        )
-      ).text();
-      // const status = (await fetch(maxres)).status;
-
-      if (status === "200") {
-        return { ...info, thumbnail: maxres };
-      }
-    }
-
-    return { ...info, thumbnail: "" };
-  }
 }
 
 // export async function getServerSideProps() {
