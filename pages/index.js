@@ -11,7 +11,7 @@ const API_KEY = process.env.API_KEY;
 
 export default function Home({ data }) {
   const [movies, setMovies] = useState();
-  const [thumbnails, setThumbnails] = useState([]);
+  const [thumbnails, setThumbnails] = useState({});
   useEffect(() => {
     (async () => {
       // const data = await (
@@ -23,15 +23,14 @@ export default function Home({ data }) {
         )
       ).json();
 
-      setThumbnails(
-        await Promise.all(
-          data.items.map((movie) =>
-            fetch(
-              `https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${movie.contentDetails.videoId}`
-            ).then((response) => response.text())
-          )
-        )
-      );
+      data.items.forEach((movie) => {
+        const id = movie.contentDetails.videoId;
+        fetch(`https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`)
+          .then((response) => response.text())
+          .then((thumbnail) => {
+            setThumbnails((prev) => ({ ...prev, [id]: thumbnail }));
+          });
+      });
       setMovies(data.items);
     })();
   }, []);
@@ -53,7 +52,7 @@ export default function Home({ data }) {
 
           return (
             <div onClick={() => onClick(id, title)} className="movie" key={id}>
-              <img src={thumbnails[i]} alt={id} />
+              {thumbnails[id] && <img src={thumbnails[id]} alt={id} />}
               <h4>
                 <Link href={url} as={url}>
                   <a>{title}</a>

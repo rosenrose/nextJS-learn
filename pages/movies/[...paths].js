@@ -19,13 +19,11 @@ export default function Detail({ paths }) {
         )
       ).json();
 
-      setThumbnail(
-        await (
-          await fetch(
-            `https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`
-          )
-        ).text()
-      );
+      fetch(`https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`)
+        .then((response) => response.text())
+        .then((thumbnail) => {
+          setThumbnail(thumbnail);
+        });
       setMovie(data.items[0]);
     })();
   }, [id]);
@@ -37,7 +35,7 @@ export default function Detail({ paths }) {
       ) : (
         <div>
           <Seo title={title} />
-          <img src={thumbnail} alt={id} />
+          {thumbnail && <img src={thumbnail} alt={id} />}
           <h4>{title}</h4>
           <pre>{JSON.stringify(movie, null, 2)}</pre>
         </div>
