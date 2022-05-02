@@ -99,6 +99,8 @@ export default function Home({ data }) {
         }
         .idInput {
           width: 20rem;
+          display: block;
+          margin: 0 auto;
         }
       `}</style>
     </>
