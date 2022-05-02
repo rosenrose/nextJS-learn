@@ -4,14 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Seo from "../components/Seo";
 
-// const id = "PLtYQ7DpMMg-I22iICgrMNC1ln3ZT4FxUj";
-const id = "UUyWiQldYO_-yeLJC0j5oq2g";
+const initPlaylistId = "UUyWiQldYO_-yeLJC0j5oq2g";
 const API_KEY = process.env.API_KEY;
-// console.log(id, API_KEY);
+// console.log(API_KEY);
 
 export default function Home({ data }) {
   const [movies, setMovies] = useState();
   const [thumbnails, setThumbnails] = useState({});
+  const [playlistId, setPlaylistId] = useState(initPlaylistId);
+
   useEffect(() => {
     (async () => {
       // const data = await (
@@ -19,7 +20,7 @@ export default function Home({ data }) {
       // ).json();
       const data = await (
         await fetch(
-          `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${id}&part=snippet,contentDetails&maxResults=20`
+          `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${playlistId}&part=snippet,contentDetails&maxResults=20`
         )
       ).json();
 
@@ -33,35 +34,46 @@ export default function Home({ data }) {
       });
       setMovies(data.items);
     })();
-  }, []);
+  }, [playlistId]);
+
   const router = useRouter();
   const onClick = (id, title) => {
     router.push(`/movies/${encodeURIComponent(title)}/${id}`);
   };
+  const onChange = (event) => {
+    setPlaylistId(event.target.value);
+  };
 
   return (
-    <div className="container">
-      <Seo title="home" />
-      {!movies ? (
-        <h1>로딩...</h1>
-      ) : (
-        movies?.map((movie, i) => {
-          const id = movie.contentDetails.videoId;
-          const title = movie.snippet.title;
-          const url = `/movies/${encodeURIComponent(title)}/${id}`;
+    <>
+      <input type="text" onChange={onChange} list="playlists" className="idInput" />
+      <datalist id="playlists">
+        <option value={initPlaylistId} />
+        <option value="PLtYQ7DpMMg-I22iICgrMNC1ln3ZT4FxUj" />
+      </datalist>
+      <div className="container">
+        <Seo title="home" />
+        {!movies ? (
+          <h1>로딩...</h1>
+        ) : (
+          movies?.map((movie, i) => {
+            const id = movie.contentDetails.videoId;
+            const title = movie.snippet.title;
+            const url = `/movies/${encodeURIComponent(title)}/${id}`;
 
-          return (
-            <div onClick={() => onClick(id, title)} className="movie" key={id}>
-              {thumbnails[id] && <img src={thumbnails[id]} alt={id} />}
-              <h4>
-                <Link href={url} as={url}>
-                  <a>{title}</a>
-                </Link>
-              </h4>
-            </div>
-          );
-        })
-      )}
+            return (
+              <div onClick={() => onClick(id, title)} className="movie" key={id}>
+                {thumbnails[id] && <img src={thumbnails[id]} alt={id} />}
+                <h4>
+                  <Link href={url} as={url}>
+                    <a>{title}</a>
+                  </Link>
+                </h4>
+              </div>
+            );
+          })
+        )}
+      </div>
       <style jsx>{`
         .container {
           display: grid;
@@ -85,8 +97,11 @@ export default function Home({ data }) {
           font-size: 18px;
           text-align: center;
         }
+        .idInput {
+          width: 20rem;
+        }
       `}</style>
-    </div>
+    </>
   );
 }
 
