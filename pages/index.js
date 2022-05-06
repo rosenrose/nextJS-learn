@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
-// import Image from "next/image";
 import { useRouter } from "next/router";
 import Seo from "../components/Seo";
 
@@ -38,7 +37,7 @@ export default function Home({ data }) {
 
   const router = useRouter();
   const onClick = (id, title) => {
-    router.push(`/movies/${encodeURIComponent(title)}/${id}`);
+    router.push(`/movies/${encodeURIComponent(title)}/${id}?thumbnail=${thumbnails[id]}`);
   };
   const onChange = (event) => {
     setPlaylistId(event.target.value);
@@ -65,7 +64,7 @@ export default function Home({ data }) {
               <div onClick={() => onClick(id, title)} className="movie" key={id}>
                 {thumbnails[id] && <img src={thumbnails[id]} alt={id} />}
                 <h4>
-                  <Link href={url} as={url}>
+                  <Link href={`${url}?thumbnail=${thumbnails[id]}`} as={url}>
                     <a>{title}</a>
                   </Link>
                 </h4>

@@ -1,15 +1,17 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-// import Image from "next/image";
 import Seo from "../../components/Seo";
 
-export default function Detail({ paths }) {
+export default function Detail(props) {
   const router = useRouter();
   const [title, id] = router.query.paths || [];
   // const [title, id] = paths || [];
 
   const [movie, setMovie] = useState();
-  const [thumbnail, setThumbnail] = useState("");
+  // console.log(router);
+  // console.log(props);
+  const thumbnail = router.query.thumbnail;
+
   useEffect(() => {
     (async () => {
       // const data = await (await fetch(`/api/video/${id}`)).json();
@@ -19,11 +21,6 @@ export default function Detail({ paths }) {
         )
       ).json();
 
-      fetch(`https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`)
-        .then((response) => response.text())
-        .then((thumbnail) => {
-          setThumbnail(thumbnail);
-        });
       setMovie(data.items[0]);
     })();
   }, [id]);
@@ -35,7 +32,7 @@ export default function Detail({ paths }) {
       ) : (
         <div>
           <Seo title={title} />
-          {thumbnail && <img src={thumbnail} alt={id} />}
+          <img src={thumbnail} alt={id} />
           <h4>{title}</h4>
           <pre>{JSON.stringify(movie, null, 2)}</pre>
         </div>
