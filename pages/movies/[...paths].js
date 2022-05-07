@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import Seo from "../../components/Seo";
 

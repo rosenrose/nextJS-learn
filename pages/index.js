@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQueries, useQuery } from "react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -28,7 +28,6 @@ export default function Home({ data }) {
   );
   // console.log(movies);
 
-  // const { isLoading: isThumbnailsLoading, data: thumbnails } = useQueries(
   const queries = useQueries(
     (movies ?? []).map((movie) => {
       const id = movie.contentDetails.videoId;
