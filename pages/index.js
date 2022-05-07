@@ -19,7 +19,7 @@ export default function Home({ data }) {
   //   })();
   // }, [playlistId]);
 
-  const { isLoading: isMoviesLoading, data: movies } = useQuery(["movies", playlistId], () =>
+  const { isLoading, data: movies } = useQuery(["movies", playlistId], () =>
     fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${playlistId}&part=snippet,contentDetails&maxResults=20`
     )
@@ -43,8 +43,8 @@ export default function Home({ data }) {
     })
   );
   // console.log(queries);
-  const isLoading =
-    isMoviesLoading || queries.map((query) => query.isLoading).reduce((a, b) => a || b);
+  // const isLoading =
+  //   isMoviesLoading || queries.map((query) => query.isLoading).reduce((a, b) => a || b);
   const thumbnails = Object.fromEntries(
     queries.map((query) => (query.data ? [query.data.id, query.data.thumbnail] : []))
   );
@@ -76,7 +76,7 @@ export default function Home({ data }) {
 
             return (
               <div onClick={() => onClick(id, title)} className="movie" key={id}>
-                <img src={thumbnails[id]} alt={id} />
+                {thumbnails?.[id] && <img src={thumbnails[id]} alt={id} />}
                 <h4>
                   <Link href={url} as={url}>
                     <a>{title}</a>
