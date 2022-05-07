@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQueries, useQuery } from "react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Seo from "../components/Seo";
@@ -8,36 +9,50 @@ const API_KEY = process.env.API_KEY;
 // console.log(API_KEY);
 
 export default function Home({ data }) {
-  const [movies, setMovies] = useState();
-  const [thumbnails, setThumbnails] = useState({});
   const [playlistId, setPlaylistId] = useState(initPlaylistId);
 
-  useEffect(() => {
-    (async () => {
-      // const data = await (
-      //   await fetch(`/api/playlist/playlistId=${id}&part=snippet,contentDetails&maxResults=20`)
-      // ).json();
-      const data = await (
-        await fetch(
-          `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${playlistId}&part=snippet,contentDetails&maxResults=20`
-        )
-      ).json();
+  // useEffect(() => {
+  //   (async () => {
+  //     const data = await (
+  //       await fetch(`/api/playlist/playlistId=${id}&part=snippet,contentDetails&maxResults=20`)
+  //     ).json();
+  //   })();
+  // }, [playlistId]);
 
-      data.items.forEach((movie) => {
-        const id = movie.contentDetails.videoId;
-        fetch(`https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`)
-          .then((response) => response.text())
-          .then((thumbnail) => {
-            setThumbnails((prev) => ({ ...prev, [id]: thumbnail }));
-          });
-      });
-      setMovies(data.items);
-    })();
-  }, [playlistId]);
+  const { isLoading: isMoviesLoading, data: movies } = useQuery(["movies", playlistId], () =>
+    fetch(
+      `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${playlistId}&part=snippet,contentDetails&maxResults=20`
+    )
+      .then((response) => response.json())
+      .then((json) => json.items)
+  );
+  // console.log(movies);
+
+  // const { isLoading: isThumbnailsLoading, data: thumbnails } = useQueries(
+  const queries = useQueries(
+    (movies ?? []).map((movie) => {
+      const id = movie.contentDetails.videoId;
+      return {
+        queryKey: id,
+        queryFn: () =>
+          fetch(
+            `https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`
+          )
+            .then((response) => response.text())
+            .then((thumbnail) => ({ id, thumbnail })),
+      };
+    })
+  );
+  // console.log(queries);
+  const isLoading =
+    isMoviesLoading || queries.map((query) => query.isLoading).reduce((a, b) => a || b);
+  const thumbnails = Object.fromEntries(
+    queries.map((query) => (query.data ? [query.data.id, query.data.thumbnail] : []))
+  );
 
   const router = useRouter();
   const onClick = (id, title) => {
-    router.push(`/movies/${encodeURIComponent(title)}/${id}?thumbnail=${thumbnails[id]}`);
+    router.push(`/movies/${encodeURIComponent(title)}/${id}`);
   };
   const onChange = (event) => {
     setPlaylistId(event.target.value);
@@ -52,19 +67,19 @@ export default function Home({ data }) {
       </datalist>
       <div className="container">
         <Seo title="home" />
-        {!movies ? (
+        {isLoading ? (
           <h1>로딩...</h1>
         ) : (
-          movies?.map((movie, i) => {
+          movies.map((movie, i) => {
             const id = movie.contentDetails.videoId;
             const title = movie.snippet.title;
             const url = `/movies/${encodeURIComponent(title)}/${id}`;
 
             return (
               <div onClick={() => onClick(id, title)} className="movie" key={id}>
-                {thumbnails[id] && <img src={thumbnails[id]} alt={id} />}
+                <img src={thumbnails[id]} alt={id} />
                 <h4>
-                  <Link href={`${url}?thumbnail=${thumbnails[id]}`} as={url}>
+                  <Link href={url} as={url}>
                     <a>{title}</a>
                   </Link>
                 </h4>

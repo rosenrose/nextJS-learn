@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import { useQuery } from "react-query";
 import Seo from "../../components/Seo";
 
 export default function Detail(props) {
@@ -7,32 +8,29 @@ export default function Detail(props) {
   const [title, id] = router.query.paths || [];
   // const [title, id] = paths || [];
 
-  const [movie, setMovie] = useState();
-  // console.log(router);
-  // console.log(props);
-  const thumbnail = router.query.thumbnail;
+  // console.log("router", router, "props", props);
+  // const thumbnail = router.query.thumbnail;
 
-  useEffect(() => {
-    (async () => {
-      // const data = await (await fetch(`/api/video/${id}`)).json();
-      const data = await (
-        await fetch(
-          `https://www.googleapis.com/youtube/v3/videos?key=${process.env.API_KEY}&id=${id}&part=snippet,contentDetails`
-        )
-      ).json();
+  const { data: thumbData } = useQuery(id, () =>
+    fetch(`https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`)
+      .then((response) => response.text())
+      .then((thumbnail) => ({ id, thumbnail }))
+  );
 
-      setMovie(data.items[0]);
-    })();
-  }, [id]);
+  const { isLoading, data: movie } = useQuery(["info", id], () =>
+    fetch(
+      `https://www.googleapis.com/youtube/v3/videos?key=${process.env.API_KEY}&id=${id}&part=snippet,contentDetails`
+    ).then((response) => response.json())
+  );
 
   return (
     <div>
-      {!movie ? (
+      {isLoading ? (
         "로딩..."
       ) : (
         <div>
           <Seo title={title} />
-          <img src={thumbnail} alt={id} />
+          <img src={thumbData.thumbnail} alt={id} />
           <h4>{title}</h4>
           <pre>{JSON.stringify(movie, null, 2)}</pre>
         </div>
