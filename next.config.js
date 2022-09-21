@@ -3,14 +3,14 @@ const API_KEY = process.env.API_KEY;
 
 module.exports = {
   reactStrictMode: true,
-  basePath: "/nextJS-intro",
-  assetPrefix: "/nextJS-intro",
+  basePath: "/nextJS-learn",
+  assetPrefix: "/nextJS-learn",
   // images: {
   //   domains: ["i.ytimg.com"],
   // },
   env: {
     API_KEY,
-    basePath: "/nextJS-intro",
+    basePath: "/nextJS-learn",
   },
   async redirects() {
     return [
